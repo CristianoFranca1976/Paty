@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Cristiano Franca" />
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Web site to sell sweet and others" />
+    <title>Paty Salgados e Doces</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="basket">
+      <h3>Basket</h3>
+      <button type="button" onclick="closeOrderBasket()" id="close-basket">
+        <img src="delete.png" alt="Close" id="close-img" />
+      </button>
+      <div id="basket-item"></div>
+      <div id="final-order"></div>
+      <button type="button" id="pedir">
+        <img src="delivery.png" alt="Enviar" id="send" />
+      </button>
+    </div>
+
+    <div id="orderBox"></div>
+    <div id="container">
+      <header>
+        <div class="menu-wrapper" id="menuWrapper">
+          <div class="menu-circle" id="menuCircle">
+            <div class="menu-icon" id="menuIcon">☰</div>
+            <div class="arc-buttons" id="arcButtons"></div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal">
+          <div id="textHTML"></div>
+          <div id="btn-fechar">
+            <button type="button" class="close-btn" onclick="closeModal()">
+              Fechar
+            </button>
+          </div>
+        </div>
+
+        <h1>Paty Salgados e Doces</h1>
+
+        <div class="login-area">
+          <img src="avatar.png" alt="avatar" class="logo" />
+
+          <% if (usuario) { %>
+          <!-- Nome do usuário logado -->
+          <p><%= usuario.name %></p>
+
+          <!-- Botão Logout -->
+          <a href="/logout">
+            <img src="logout.png" alt="Logout" class="logo" />
+          </a>
+          <% } else { %>
+          <!-- Botão Login -->
+          <a href="/login">
+            <img src="login.png" alt="Login" class="logo" />
+          </a>
+          <% } %>
+
+          <button type="button" onclick="openBasket()">
+            <img src="box_close.png" alt="Box" class="logo" id="box-img" />
+          </button>
+          <p id="basket-qt"></p>
+        </div>
+      </header>
+
+      <p id="message"></p>
+
+      <h4>Salgados</h4>
+      <div class="slider-wrapper slider-wrapper1">
+        <div id="sliderTrack1" class="slider-track"></div>
+        <button type="button" class="nav-button prev-button" data-target="1">
+          ◀
+        </button>
+        <button type="button" class="nav-button next-button" data-target="1">
+          ▶
+        </button>
+      </div>
+
+      <h4>Doces</h4>
+      <div class="slider-wrapper slider-wrapper2">
+        <div id="sliderTrack2" class="slider-track"></div>
+        <button type="button" class="nav-button prev-button" data-target="2">
+          ◀
+        </button>
+        <button type="button" class="nav-button next-button" data-target="2">
+          ▶
+        </button>
+      </div>
+
+      <footer>
+        <div class="copyright">
+          <a
+            href="https://copyright-ru.vercel.app/"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="copyright.png" alt="copyright" class="logo" />
+          </a>
+          <p>Copyright</p>
+        </div>
+        <div id="social-links">
+          <a
+            href="https://github.com/CristianoFranca1976"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="github.png" alt="Github" class="logo" />
+          </a>
+          <a
+            href="https://www.instagram.com/cristianofranca83/"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="instagram.png" alt="Instagram" class="logo" />
+          </a>
+          <a
+            href="https://www.youtube.com/channel/UCim3c539P4CJQOIMGPaT1oQ"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="youtube.png" alt="Youtube" class="logo" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/cristiano-franca-4a968627a/"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="linkedin.png" alt="Linkedin" class="logo" />
+          </a>
+          <a href="https://donates.vercel.app/" target="_blank" rel="noopener">
+            <img src="donate.png" alt="Donate" class="logo" />
+          </a>
+        </div>
+      </footer>
+      <div id="comercial"></div>
+    </div>
+
+    <script>
+      // Função para calcular total do pedido
+      function calcularTotal(itens) {
+        return itens.reduce((soma, item) => soma + item.preco, 0);
+      }
+
+      // Evento do botão "pedir"
+      document.getElementById("pedir")?.addEventListener("click", async () => {
+        // Aqui você deve pegar os itens do seu carrinho real.
+        // Exemplo usando variáveis do script.js:
+        let carrinho = window.basketItems || []; // supondo que você já tenha isso no script.js
+
+        if (!carrinho || carrinho.length === 0) {
+          alert("O carrinho está vazio!");
+          return;
+        }
+
+        const total = calcularTotal(carrinho);
+        const solicita = carrinho.map((item) => item.nome); // apenas nomes
+
+        console.log("📦 Enviando para servidor:", { solicita, total });
+
+        try {
+          const resposta = await fetch("/pedido", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ solicita, total }),
+          });
+
+          const resultado = await resposta.json();
+          if (resultado.sucesso) {
+            alert("Pedido enviado com sucesso!");
+            // Limpar o carrinho
+            if (window.clearBasket) window.clearBasket();
+          } else {
+            alert("Erro: " + resultado.mensagem);
+          }
+        } catch (erro) {
+          console.error("❌ Erro ao enviar pedido:", erro);
+          alert("Erro ao enviar pedido.");
+        }
+      });
+    </script>
+    <script src="/script.js"></script>
+  </body>
+</html>
