@@ -13,7 +13,7 @@ const app = express();
 
 // --- Configurar CORS ---
 app.use(cors({
-  origin: "https://paty-eight.vercel.app/", 
+  origin: process.env.ORIGIN || "http://localhost:5000", 
   credentials: true
 }));
 
