@@ -45,11 +45,10 @@
         <h1>Paty Salgados e Doces</h1>
 
         <div class="login-area">
-          <img src="avatar.png" alt="avatar" class="logo" />
 
           <% if (usuario) { %>
           <!-- Nome do usuário logado -->
-          <p><%= usuario.name %></p>
+          <p id="login-name"><%= usuario.name %></p>
 
           <!-- Botão Logout -->
           <a href="/logout">
@@ -58,7 +57,7 @@
           <% } else { %>
           <!-- Botão Login -->
           <a href="/login">
-            <img src="login.png" alt="Login" class="logo" />
+            <img src="avatar.png" alt="Login" class="logo" />
           </a>
           <% } %>
 
@@ -72,16 +71,19 @@
       <p id="message"></p>
 
       <h4>Salgados</h4>
-      <div class="slider-wrapper slider-wrapper1">
-        <div id="sliderTrack1" class="slider-track"></div>
-        <button type="button" class="nav-button prev-button" data-target="1">
-          ◀
-        </button>
-        <button type="button" class="nav-button next-button" data-target="1">
-          ▶
-        </button>
+      
+        <div class="slider-wrapper slider-wrapper1">
+          <h2 class="indisponivel">Indisponível no momento</h2>
+          <div class="desativada">
+          <div id="sliderTrack1" class="slider-track"></div>
+          <button type="button" class="nav-button prev-button" data-target="1">
+            ◀
+          </button>
+          <button type="button" class="nav-button next-button" data-target="1">
+            ▶
+          </button>
+        </div>
       </div>
-
       <h4>Doces</h4>
       <div class="slider-wrapper slider-wrapper2">
         <div id="sliderTrack2" class="slider-track"></div>
@@ -138,7 +140,6 @@
           </a>
         </div>
       </footer>
-      <div id="comercial"></div>
     </div>
 
     <script>

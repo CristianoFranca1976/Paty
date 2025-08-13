@@ -388,7 +388,7 @@ function openOrder(item) {
 
     if (!isNaN(value) && value >= 0) {
       const total = value * precoUnitario;
-      somaElement.textContent = total.toFixed(2);
+      somaElement.textContent = "£ " + total.toFixed(2);
     } else {
       somaElement.textContent = " £0.00";
     }
@@ -574,16 +574,16 @@ for (let i = 0; i < totalButtons; i++) {
       <p>Aqui, cada encomenda é feita como se fosse para minha própria família, porque acredito que comida boa é aquela que aquece o coração. Seja para um café da tarde, uma festa ou um momento especial, você vai encontrar aqui o sabor e a qualidade que merecem estar na sua mesa.</p>
       <p>Hoje, trago essa tradição para você, oferecendo produtos feitos com ingredientes frescos e selecionados, sempre com aquele toque especial que só quem ama cozinhar pode dar. Seja para uma festa, um lanche da tarde ou um momento de confraternização, estou aqui para tornar seu dia mais doce e saboroso.</p>
     `;
-        const photoGallery = `
+  const photoGallery = `
       <h3>Photo Gallery</h3>  
       <img src="${images[0]}" alt="Gallery" id="img">
     `;
-        const commercial = `
+  const commercial = `
       <h3>Pedidos</h3>
       <div ="commercial"></div>
 
     `;
-        const priceList = `
+  const priceList = `
       <h3>Tabela de precos</h3>
       <table>
     <caption>
@@ -665,7 +665,6 @@ for (let i = 0; i < totalButtons; i++) {
 </table>
     `;
 
-
   const btn = document.createElement("button");
   btn.setAttribute("type", "button");
   btn.className = "arc-button";
@@ -693,51 +692,74 @@ for (let i = 0; i < totalButtons; i++) {
         index = (index + 1) % images.length;
       }, 5000);
     } else if (i === 2) {
-  // Mostra título
-  textHTML.innerHTML = "<h3>Pedidos</h3><p>Carregando...</p>";
+      // Mostra título
+      textHTML.innerHTML = "<h3>Pedidos</h3><p>Carregando...</p>";
 
-  // Busca pedidos do usuário logado
-  fetch("/meus-pedidos", { credentials: "include" })
-    .then(res => res.json())
-    .then(pedidos => {
-      if (!pedidos.length) {
-        textHTML.innerHTML = "<h3>Pedidos</h3><p>Você não tem pedidos ainda.</p>";
-        return;
-      }
+      // Busca pedidos do usuário logado
+      fetch("/meus-pedidos", { credentials: "include" })
+        .then((res) => res.json())
+        .then((pedidos) => {
+          if (!pedidos.length) {
+            textHTML.innerHTML =
+              "<h3>Pedidos</h3><p>Você não tem pedidos ainda.</p>";
+            return;
+          }
 
-      // Monta HTML
-      let html = `<h3>Pedidos</h3>
+          // Monta HTML
+          let html = `<h3>Pedidos</h3>
       
       <p>Você tem ${pedidos.length} pedido(s).</p>
       <hr>`;
-      pedidos.forEach(p => {
-        html += `
+          pedidos.forEach((p) => {
+            html += `
           <div class="pedido">
-            <p><strong>Pedido em:</strong> ${new Date(p.data).toLocaleString()}</p>
+            <p><strong>Pedido em:</strong> ${new Date(
+              p.data
+            ).toLocaleString()}</p>
             <p><strong>Cliente:</strong> ${p.cliente}</p>
             <p><strong>Itens:</strong></p>
             <ul>
-              ${p.itens.map(item => `<li>${item.label} (${item.qtd}) - £ ${item.subtotal.toFixed(2)}</li>`).join("")}
+              ${p.itens
+                .map(
+                  (item) =>
+                    `<li>${item.label} (${
+                      item.qtd
+                    }) - £ ${item.subtotal.toFixed(2)}</li>`
+                )
+                .join("")}
             </ul>
             <p><strong>Total:</strong> R$ ${p.total.toFixed(2)}</p>
             <p><strong>Status:</strong> ${p.status}</p>
             <p><strong>Observações:</strong> ${p.observacoes || "Nenhuma"}</p>
             <p><strong>Entregue:</strong> ${p.entregue}</p>
-            <p><strong>Data de entrega:</strong> ${p.dataEntrega ? new Date(p.dataEntrega).toLocaleString() : "Não definida"}</p>
-            <p><strong>Data de pagamento:</strong> ${p.dataPagamento ? new Date(p.dataPagamento).toLocaleString() : "Não definido"}</p>
-            <p><strong>Data de cancelamento:</strong> ${p.dataCancelamento ? new Date(p.dataCancelamento).toLocaleString() : "Não definido"}</p>
+            <p><strong>Data de entrega:</strong> ${
+              p.dataEntrega
+                ? new Date(p.dataEntrega).toLocaleString()
+                : "Não definida"
+            }</p>
+            <p><strong>Data de pagamento:</strong> ${
+              p.dataPagamento
+                ? new Date(p.dataPagamento).toLocaleString()
+                : "Não definido"
+            }</p>
+            <p><strong>Data de cancelamento:</strong> ${
+              p.dataCancelamento
+                ? new Date(p.dataCancelamento).toLocaleString()
+                : "Não definido"
+            }</p>
           </div>
           <hr>
         `;
-      });
+          });
 
-      textHTML.innerHTML = html;
-    })
-    .catch(err => {
-      console.error(err);
-      textHTML.innerHTML = "<h3>Pedidos</h3><p>Erro ao carregar pedidos.</p>";
-    });
-} else if (i === 3) {
+          textHTML.innerHTML = html;
+        })
+        .catch((err) => {
+          console.error(err);
+          textHTML.innerHTML =
+            "<h3>Pedidos</h3><p>Erro ao carregar pedidos.</p>";
+        });
+    } else if (i === 3) {
       textHTML.innerHTML = priceList;
     }
 
@@ -760,20 +782,24 @@ menuCircle.addEventListener("click", () => {
 /* ---------- ENVIO DO PEDIDO AO BACKEND (/pedido) ---------- */
 document.getElementById("pedir")?.addEventListener("click", async () => {
   // Se o carrinho for salvo em "arry", usa ele. Se não, tenta pegar do window.basketItems.
-  const carrinho = Array.isArray(window.arry) ? window.arry : window.basketItems || [];
+  const carrinho = Array.isArray(window.arry)
+    ? window.arry
+    : window.basketItems || [];
 
   if (!Array.isArray(carrinho) || carrinho.length === 0) {
-    alert("O carrinho está vazio!");
+    document.getElementById("basket").style.display = "none";
+    alert("O carrinho será limpo!");
+    
     return;
   }
 
   // Monta o array no formato que o servidor espera
-  const solicita = carrinho.map(it => ({
+  const solicita = carrinho.map((it) => ({
     label: it.label || it.nome || "Item",
     qtd: it.quantidade || 1,
     tamanho: it.tamanho || "",
     unitPrice: it.unitPrice || it.preco || 0,
-    subtotal: it.subtotal || (it.preco ? it.preco * (it.quantidade || 1) : 0)
+    subtotal: it.subtotal || (it.preco ? it.preco * (it.quantidade || 1) : 0),
   }));
 
   const total = solicita.reduce((sum, it) => sum + it.subtotal, 0);
@@ -784,19 +810,21 @@ document.getElementById("pedir")?.addEventListener("click", async () => {
     const res = await fetch("/pedido", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ solicita, total })
+      body: JSON.stringify({ solicita, total }),
     });
 
     const data = await res.json();
     if (data.sucesso) {
       alert("✅ Pedido enviado com sucesso!");
+      document.getElementById("basket").style.display = "none";
       if (typeof clearBasket === "function") clearBasket(); // limpa o carrinho se função existir
     } else {
-      alert("❌ Erro: " + (data.mensagem || "Não foi possível enviar o pedido"));
+      alert(
+        "❌ Erro: " + (data.mensagem || "Não foi possível enviar o pedido")
+      );
     }
   } catch (err) {
     console.error("Erro ao enviar pedido:", err);
     alert("Erro ao enviar pedido.");
   }
 });
-

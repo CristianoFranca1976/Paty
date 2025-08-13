@@ -27,6 +27,7 @@ h2 {
 
 .form-container {
   width: 300px;
+  max-height: 450px;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #ccc;
@@ -36,6 +37,16 @@ h2 {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+#link-a {
+  text-decoration: none;
+  color: green;
+  margin-left: 5px;
+  text-transform: uppercase;
+}
+#link-a:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -54,6 +65,10 @@ h2 {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px groove yellow;
+  outline: none;
 }
 
 .submit-btn {
@@ -80,12 +95,10 @@ p {
 /* heater */
 
 #container {
-  /* border: 1px solid red; */
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 1200px;
-
   flex-direction: column;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -96,7 +109,6 @@ p {
 }
 
 header {
-  /* border: 1px solid green; */
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -128,6 +140,10 @@ header button {
   align-items: center;
   justify-content: center;
   gap: 15px;
+}
+#login-name {
+  margin: 0;
+  text-transform: uppercase;
 }
 .logo {
   width: 3vh;
@@ -283,17 +299,28 @@ h1 {
   padding: 20px;
   border-radius: 10px;
   overflow-y: auto;
-}
-#textHTML::-webkit-outer-spin-button,
-#textHTML::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+  scroll-behavior: smooth;
 }
 #textHTML::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: transparent;
 }
-
+#textHTML::-webkit-scrollbar {
+  width: 6px;
+  background-color: transparent;
+}
+#textHTML::-webkit-scrollbar-thumb {
+  background-color: #fddc01;
+}
+#textHTML::-webkit-scrollbar-button {
+  background-color: #fddc01;
+}
+#textHTML::-webkit-scrollbar-corner {
+  background-color: black;
+}
+#textHTML::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
 #textHTML p {
   font-family: "Bricolage Grotesque", sans-serif;
   font-size: 16px;
@@ -352,7 +379,6 @@ td {
 /* footer */
 
 footer {
-  /* border: 1px solid black; */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -386,7 +412,7 @@ footer {
 }
 #social-links a:hover {
   background: #2a2122;
-  box-shadow: inset 0 0 1em rgba(255, 217, 0, 0.692), 0 0 1em red;
+  box-shadow: inset 0 0 1em rgba(255, 217, 0, 0.692), 0 0 1em rgb(255, 208, 0);
 }
 a img {
   width: 35px;
@@ -422,6 +448,27 @@ h4 {
   position: relative;
   display: flex;
   align-items: center;
+}
+.slider-wrapper1 {
+  cursor: not-allowed;
+}
+
+.desativada {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  opacity: 0.5;
+}
+.indisponivel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  font-size: 4vh;
+  text-transform: uppercase;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  text-shadow: 2px 2px 15px rgb(0, 0, 0);
 }
 
 .slider-track {
