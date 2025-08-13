@@ -4,7 +4,7 @@
   "description": "Website sell sweets and other",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "start": "node src/server.js"
   },
   "author": "Cristiano Franca",
   "license": "ISC",
