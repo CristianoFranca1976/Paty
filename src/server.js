@@ -38,8 +38,8 @@ function verificarLogin(req, res, next) {
 
 // --- Configurações gerais ---
 app.use(express.json());
-// app.use(express.static("public"));
-// app.use(express.static("image"));
+app.use(express.static("public"));
+app.use(express.static("image"));
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../image")));
 app.use(express.urlencoded({ extended: false }));
