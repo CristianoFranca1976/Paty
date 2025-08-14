@@ -11,6 +11,9 @@ const nodemailer = require("nodemailer");
 
 const app = express();
 
+// Middleware para analisar URL encoded
+app.use(express.urlencoded({ extended: true }));
+
 // --- Configurar CORS ---
 app.use(cors({
   origin: process.env.ORIGIN || "http://localhost:5000", 
