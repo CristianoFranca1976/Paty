@@ -266,10 +266,9 @@ function initSlider(images, trackId, wrapperClass) {
 initSlider(salgados, "sliderTrack1", "slider-wrapper1");
 initSlider(doces, "sliderTrack2", "slider-wrapper2");
 
-
 // Em cima do arquivo (script.js)
 const API_BASE_URL = window.location.hostname.includes("localhost")
-  ? "http://localhost:5000"           // URL do backend local
+  ? "http://localhost:5000" // URL do backend local
   : "https://paty-pedidos.vercel.app/"; // URL do backend em produção (ex: Render/Railway)
 
 // helper para checar se a resposta é JSON, evitando o "Unexpected token '<'"
@@ -278,11 +277,12 @@ async function fetchJSON(url, options = {}) {
   const ct = res.headers.get("content-type") || "";
   if (!ct.includes("application/json")) {
     const txt = await res.text();
-    throw new Error(`Resposta não-JSON (${res.status}). Início: ${txt.slice(0,120)}`);
+    throw new Error(
+      `Resposta não-JSON (${res.status}). Início: ${txt.slice(0, 120)}`
+    );
   }
   return res.json();
 }
-
 
 /* ----------- CARRINHO (corrigido) ----------- */
 
@@ -807,7 +807,7 @@ document.getElementById("pedir")?.addEventListener("click", async () => {
   if (!Array.isArray(carrinho) || carrinho.length === 0) {
     document.getElementById("basket").style.display = "none";
     alert("O carrinho será limpo!");
-    
+
     return;
   }
 
@@ -825,12 +825,12 @@ document.getElementById("pedir")?.addEventListener("click", async () => {
   console.log("📦 Enviando pedido para o servidor:", { solicita, total });
 
   try {
-    const res = await fetch("/pedido", {
+    const res = await fetch(`${API_BASE_URL}/pedido`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // MUITO IMPORTANTE!
       body: JSON.stringify({ solicita, total }),
     });
-
     const data = await res.json();
     if (data.sucesso) {
       alert("✅ Pedido enviado com sucesso!");
