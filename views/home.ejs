@@ -8,7 +8,7 @@
     <meta name="description" content="Web site to sell sweet and others" />
     <title>Paty Salgados e Doces</title>
     <link rel="stylesheet" href="/style.css" />
-    <link rel="shortcut icon" href="LetraC.png" type="image/x-icon">
+    <link rel="shortcut icon" href="LetraC.png" type="image/x-icon" />
   </head>
   <body>
     <div id="basket">
@@ -46,7 +46,6 @@
         <h1>Paty Salgados e Doces</h1>
 
         <div class="login-area">
-
           <% if (usuario) { %>
           <!-- Nome do usuário logado -->
           <p id="login-name"><%= usuario.name %></p>
@@ -72,10 +71,10 @@
       <p id="message"></p>
 
       <h4>Salgados</h4>
-      
-        <div class="slider-wrapper slider-wrapper1">
-          <h2 class="indisponivel">Indisponível no momento</h2>
-          <div class="desativada">
+
+      <div class="slider-wrapper slider-wrapper1">
+        <h2 class="indisponivel">Indisponível no momento</h2>
+        <div class="desativada">
           <div id="sliderTrack1" class="slider-track"></div>
           <button type="button" class="nav-button prev-button" data-target="1">
             ◀
@@ -166,11 +165,13 @@
         console.log("📦 Enviando para servidor:", { solicita, total });
 
         try {
-          const resposta = await fetch("/pedido", {
+          const resposta = await fetch(`${API_BASE_URL}/pedido`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include", // MUITO IMPORTANTE!
             body: JSON.stringify({ solicita, total }),
           });
+          const data = await resposta.json();
 
           const resultado = await resposta.json();
           if (resultado.sucesso) {

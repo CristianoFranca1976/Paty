@@ -11,14 +11,25 @@ const nodemailer = require("nodemailer");
 
 const app = express();
 
-// Middleware para analisar URL encoded
-app.use(express.urlencoded({ extended: true }));
+const allowedOrigins = [
+  "http://localhost:5000",
+  "http://localhost:3000",
+  "https://paty-pedidos.vercel.app", // seu frontend no Vercel
+];
+
+
 
 // --- Configurar CORS ---
 app.use(cors({
-  origin: process.env.ORIGIN || "http://localhost:5000", 
-  credentials: true
+  origin: function (origin, cb) {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("CORS: origem não permitida"));
+  },
+  credentials: true,
 }));
+
+// se estiver atrás de proxy (produção), habilite:
+app.set("trust proxy", 1);
 
 // --- Sessão ---
 app.use(session({
@@ -26,7 +37,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60 // 1 hora
+    maxAge: 1000 * 60 * 60,
+    secure: process.env.NODE_ENV === "production",       // true em produção
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   }
 }));
 

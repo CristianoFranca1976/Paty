@@ -266,6 +266,24 @@ function initSlider(images, trackId, wrapperClass) {
 initSlider(salgados, "sliderTrack1", "slider-wrapper1");
 initSlider(doces, "sliderTrack2", "slider-wrapper2");
 
+
+// Em cima do arquivo (script.js)
+const API_BASE_URL = window.location.hostname.includes("localhost")
+  ? "http://localhost:5000"           // URL do backend local
+  : "https://SEU-BACKEND-ONLINE.com"; // URL do backend em produção (ex: Render/Railway)
+
+// helper para checar se a resposta é JSON, evitando o "Unexpected token '<'"
+async function fetchJSON(url, options = {}) {
+  const res = await fetch(url, options);
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    const txt = await res.text();
+    throw new Error(`Resposta não-JSON (${res.status}). Início: ${txt.slice(0,120)}`);
+  }
+  return res.json();
+}
+
+
 /* ----------- CARRINHO (corrigido) ----------- */
 
 /* Use var para garantir que a variável esteja disponível globalmente se precisar acessar via console */
@@ -696,7 +714,7 @@ for (let i = 0; i < totalButtons; i++) {
       textHTML.innerHTML = "<h3>Pedidos</h3><p>Carregando...</p>";
 
       // Busca pedidos do usuário logado
-      fetch("/meus-pedidos", { credentials: "include" })
+      fetchJSON(`${API_BASE_URL}/meus-pedidos`, { credentials: "include" })
         .then((res) => res.json())
         .then((pedidos) => {
           if (!pedidos.length) {
