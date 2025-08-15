@@ -270,7 +270,7 @@ initSlider(doces, "sliderTrack2", "slider-wrapper2");
 // Em cima do arquivo (script.js)
 const API_BASE_URL = window.location.hostname.includes("localhost")
   ? "http://localhost:5000"           // URL do backend local
-  : "https://SEU-BACKEND-ONLINE.com"; // URL do backend em produção (ex: Render/Railway)
+  : "https://paty-pedidos.vercel.app/"; // URL do backend em produção (ex: Render/Railway)
 
 // helper para checar se a resposta é JSON, evitando o "Unexpected token '<'"
 async function fetchJSON(url, options = {}) {
