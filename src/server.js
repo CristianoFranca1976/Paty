@@ -14,7 +14,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5000",
   "http://localhost:3000",
-  "https://paty-pedidos.vercel.app", // seu frontend no Vercel
+  "https://paty-8hpw.onrender.com", // seu frontend no Vercel
 ];
 
 
