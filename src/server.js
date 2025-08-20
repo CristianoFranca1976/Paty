@@ -139,17 +139,18 @@ app.post("/login", async (req, res) => {
 // --- Buscar pedidos do usuário logado ---
 app.get("/meus-pedidos", async (req, res) => {
   if (!req.session.usuario) {
-    return res.status(401).json([]);
+    return res.status(401).json({ sucesso: false, mensagem: "Não autenticado", pedidos: [] });
   }
 
   try {
-    const pedidos = await Pedido.find({ cliente: req.session.usuario.name }).sort({ data: -1 });
-    res.json(pedidos);
+    const pedidos = await Pedido.find({ email: req.session.usuario.email }).sort({ data: -1 });
+    res.json({ sucesso: true, pedidos });
   } catch (err) {
-    console.error(err);
-    res.status(500).json([]);
+    console.error("Erro ao buscar pedidos:", err);
+    res.status(500).json({ sucesso: false, mensagem: "Erro interno", pedidos: [] });
   }
 });
+
 
 // Logout
 app.get("/logout", (req, res) => {
@@ -229,13 +230,14 @@ app.post("/pedido", verificarLogin, async (req, res) => {
 // Histórico
 app.get("/historico", verificarLogin, async (req, res) => {
   try {
-    const pedidos = await Pedido.find({ cliente: req.session.usuario.name }).sort({ data: -1 });
+    const pedidos = await Pedido.find({ email: req.session.usuario.email }).sort({ data: -1 });
     res.render("historico", { usuario: req.session.usuario, pedidos });
   } catch (err) {
     console.error(err);
     res.send("Erro ao buscar histórico de pedidos.");
   }
 });
+
 
 // Inicia servidor
 const port = process.env.PORT || 5000;
