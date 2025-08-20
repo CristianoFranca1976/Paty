@@ -715,68 +715,47 @@ for (let i = 0; i < totalButtons; i++) {
 
       // Busca pedidos do usuário logado
       fetchJSON(`${API_BASE_URL}/meus-pedidos`, { credentials: "include" })
-        .then((res) => res.json())
-        .then((pedidos) => {
-          if (!pedidos.length) {
-            textHTML.innerHTML =
-              "<h3>Pedidos</h3><p>Você não tem pedidos ainda.</p>";
-            return;
-          }
+  .then((res) => {
+    // se backend responde {sucesso, pedidos}
+    if (!res.sucesso) {
+      textHTML.innerHTML = "<h3>Pedidos</h3><p>Você não tem pedidos ainda.</p>";
+      return;
+    }
 
-          // Monta HTML
-          let html = `<h3>Pedidos</h3>
-      
-      <p>Você tem ${pedidos.length} pedido(s).</p>
-      <hr>`;
-          pedidos.forEach((p) => {
-            html += `
-          <div class="pedido">
-            <p><strong>Pedido em:</strong> ${new Date(
-              p.data
-            ).toLocaleString()}</p>
-            <p><strong>Cliente:</strong> ${p.cliente}</p>
-            <p><strong>Itens:</strong></p>
-            <ul>
-              ${p.itens
-                .map(
-                  (item) =>
-                    `<li>${item.label} (${
-                      item.qtd
-                    }) - £ ${item.subtotal.toFixed(2)}</li>`
-                )
-                .join("")}
-            </ul>
-            <p><strong>Total:</strong> R$ ${p.total.toFixed(2)}</p>
-            <p><strong>Status:</strong> ${p.status}</p>
-            <p><strong>Observações:</strong> ${p.observacoes || "Nenhuma"}</p>
-            <p><strong>Entregue:</strong> ${p.entregue}</p>
-            <p><strong>Data de entrega:</strong> ${
-              p.dataEntrega
-                ? new Date(p.dataEntrega).toLocaleString()
-                : "Não definida"
-            }</p>
-            <p><strong>Data de pagamento:</strong> ${
-              p.dataPagamento
-                ? new Date(p.dataPagamento).toLocaleString()
-                : "Não definido"
-            }</p>
-            <p><strong>Data de cancelamento:</strong> ${
-              p.dataCancelamento
-                ? new Date(p.dataCancelamento).toLocaleString()
-                : "Não definido"
-            }</p>
-          </div>
-          <hr>
-        `;
-          });
+    const pedidos = res.pedidos;
+    if (!pedidos.length) {
+      textHTML.innerHTML = "<h3>Pedidos</h3><p>Você não tem pedidos ainda.</p>";
+      return;
+    }
 
-          textHTML.innerHTML = html;
-        })
-        .catch((err) => {
-          console.error(err);
-          textHTML.innerHTML =
-            "<h3>Pedidos</h3><p>Erro ao carregar pedidos.</p>";
-        });
+    // monta HTML...
+    let html = `<h3>Pedidos</h3>
+    <p>Você tem ${pedidos.length} pedido(s).</p>
+    <hr>`;
+    pedidos.forEach((p) => {
+      html += `
+        <div class="pedido">
+          <p><strong>Pedido em:</strong> ${new Date(p.data).toLocaleString()}</p>
+          <p><strong>Cliente:</strong> ${p.cliente}</p>
+          <p><strong>Itens:</strong></p>
+          <ul>
+            ${p.itens.map(item =>
+              `<li>${item.label} (${item.qtd}) - R$ ${item.subtotal.toFixed(2)}</li>`
+            ).join("")}
+          </ul>
+          <p><strong>Total:</strong> R$ ${p.total.toFixed(2)}</p>
+        </div>
+        <hr>
+      `;
+    });
+
+    textHTML.innerHTML = html;
+  })
+  .catch((err) => {
+    console.error(err);
+    textHTML.innerHTML = "<h3>Pedidos</h3><p>Erro ao carregar pedidos.</p>";
+  });
+
     } else if (i === 3) {
       textHTML.innerHTML = priceList;
     }
