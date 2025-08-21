@@ -1,4 +1,3 @@
-
 require("dotenv").config(); // para usar variáveis do .env
 const express = require("express");
 const path = require("path");
@@ -8,7 +7,6 @@ const session = require("express-session");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 
-
 const app = express();
 
 const allowedOrigins = [
@@ -17,31 +15,33 @@ const allowedOrigins = [
   "https://paty-8hpw.onrender.com", // seu frontend no Vercel
 ];
 
-
-
 // --- Configurar CORS ---
-app.use(cors({
-  origin: function (origin, cb) {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-    return cb(new Error("CORS: origem não permitida"));
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: function (origin, cb) {
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error("CORS: origem não permitida"));
+    },
+    credentials: true,
+  })
+);
 
 // se estiver atrás de proxy (produção), habilite:
 app.set("trust proxy", 1);
 
 // --- Sessão ---
-app.use(session({
-  secret: process.env.SECRET || "chave-super-secreta",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60,
-    secure: process.env.NODE_ENV === "production",       // true em produção
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SECRET || "chave-super-secreta",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60,
+      secure: process.env.NODE_ENV === "production", // true em produção
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    },
+  })
+);
 
 // Middleware para verificar login
 function verificarLogin(req, res, next) {
@@ -66,14 +66,13 @@ console.log("📧 EMAIL_USER:", process.env.EMAIL_USER);
 console.log("📧 EMAIL_PASS:", process.env.EMAIL_PASS ? "OK" : "NÃO DEFINIDO");
 console.log("📧 EMAIL_OWNER:", process.env.EMAIL_OWNER);
 
-
 // --- Configurar Nodemailer ---
 const transporter = nodemailer.createTransport({
   service: "gmail", // ou outro serviço
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 // --- Rotas ---
@@ -90,6 +89,7 @@ app.get("/signup", (req, res) => {
 });
 
 // Registrar Usuário
+// Registrar Usuário
 app.post("/signup", async (req, res) => {
   const data = {
     name: req.body.username,
@@ -97,15 +97,17 @@ app.post("/signup", async (req, res) => {
     password: req.body.password,
   };
 
-  const existingUser = await Usuario.findOne({ name: data.name });
+  const existingUser = await Usuario.findOne({
+    $or: [{ name: data.name }, { email: data.email }],
+  });
   if (existingUser) {
-    return res.send("Usuário já existe. Escolha outro nome.");
+    return res.send("Usuário ou e-mail já existe. Escolha outro.");
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
   data.password = hashedPassword;
 
-  await Usuario.insertMany(data);
+  await Usuario.create(data);
   res.redirect("/login");
 });
 
@@ -113,22 +115,23 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const check = await Usuario.findOne({
-      $or: [
-        { name: req.body.username },
-        { email: req.body.username }
-      ]
+      $or: [{ name: req.body.username }, { email: req.body.username }],
     });
 
     if (!check) {
       return res.render("login", { erro: "Usuário ou e-mail não encontrado." });
     }
 
-    const isPasswordMatch = await bcrypt.compare(req.body.password, check.password);
+    const isPasswordMatch = await bcrypt.compare(
+      req.body.password,
+      check.password
+    );
     if (!isPasswordMatch) {
       return res.render("login", { erro: "Senha incorreta." });
     }
 
     req.session.usuario = { name: check.name, email: check.email };
+    console.log("🔐 Sessão salva:", req.session.usuario);
     res.redirect("/");
   } catch (err) {
     console.error("Erro no login:", err);
@@ -145,20 +148,20 @@ app.get("/meus-pedidos", async (req, res) => {
   try {
     // Busca pedidos só do email do usuário logado
     const pedidos = await Pedido.find({
-      email: req.session.usuario.email,  // ✅ filtro pelo email
+      email: req.session.usuario.email, // ✅ filtro pelo email
     }).sort({ data: -1 });
 
     res.json(pedidos);
+    console.log("👤 Buscando pedidos de:", req.session.usuario.email);
   } catch (err) {
     console.error("Erro ao buscar pedidos:", err);
     res.status(500).json({ erro: "Erro ao buscar pedidos" });
   }
 });
 
-
 // Logout
 app.get("/logout", (req, res) => {
-  req.session.destroy(err => {
+  req.session.destroy((err) => {
     if (err) {
       return res.send("Erro ao sair.");
     }
@@ -173,23 +176,32 @@ app.post("/pedido", verificarLogin, async (req, res) => {
 
     const { solicita, total } = req.body;
     if (!solicita || !total) {
-      return res.status(400).json({ sucesso: false, mensagem: "Dados inválidos." });
+      return res
+        .status(400)
+        .json({ sucesso: false, mensagem: "Dados inválidos." });
     }
 
     const novoPedido = new Pedido({
       cliente: req.session.usuario.name,
       email: req.session.usuario.email,
       itens: solicita,
-      total: total
+      total: total,
     });
 
     await novoPedido.save();
     console.log("✅ Pedido salvo no banco");
+    console.log("📧 Email usado para salvar pedido:", req.session.usuario.email);
+
 
     // Formatar itens para e-mail
-    const itensHTML = solicita.map(item =>
-      `<li>${item.label} - ${item.qtd}x ${item.tamanho || ""} (R$ ${item.unitPrice.toFixed(2)})</li>`
-    ).join("");
+    const itensHTML = solicita
+      .map(
+        (item) =>
+          `<li>${item.label} - ${item.qtd}x ${
+            item.tamanho || ""
+          } (R$ ${item.unitPrice.toFixed(2)})</li>`
+      )
+      .join("");
 
     const dataFormatada = new Date().toLocaleString("pt-BR");
 
@@ -207,7 +219,7 @@ app.post("/pedido", verificarLogin, async (req, res) => {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_OWNER,
       subject: "📦 Novo pedido recebido",
-      html: htmlPedido
+      html: htmlPedido,
     });
 
     // Enviar para o cliente
@@ -220,21 +232,30 @@ app.post("/pedido", verificarLogin, async (req, res) => {
         <p>Recebemos o seu pedido e já estamos processando.</p>
         ${htmlPedido}
         <p>Obrigado por comprar conosco! 🍰</p>
-      `
+      `,
     });
 
-    res.json({ sucesso: true, mensagem: "Pedido salvo e e-mails enviados com sucesso!" });
-
+    res.json({
+      sucesso: true,
+      mensagem: "Pedido salvo e e-mails enviados com sucesso!",
+    });
   } catch (err) {
     console.error("❌ Erro ao salvar pedido ou enviar e-mail:", err);
-    res.status(500).json({ sucesso: false, mensagem: "Erro ao salvar pedido ou enviar e-mail." });
+    res
+      .status(500)
+      .json({
+        sucesso: false,
+        mensagem: "Erro ao salvar pedido ou enviar e-mail.",
+      });
   }
 });
 
 // Histórico
 app.get("/historico", verificarLogin, async (req, res) => {
   try {
-    const pedidos = await Pedido.find({ email: req.session.usuario.email }).sort({ data: -1 });
+    const pedidos = await Pedido.find({
+      email: req.session.usuario.email,
+    }).sort({ data: -1 });
 
     res.render("historico", { usuario: req.session.usuario, pedidos });
   } catch (err) {
@@ -242,7 +263,6 @@ app.get("/historico", verificarLogin, async (req, res) => {
     res.send("Erro ao buscar histórico de pedidos.");
   }
 });
-
 
 // Inicia servidor
 const port = process.env.PORT || 5000;
