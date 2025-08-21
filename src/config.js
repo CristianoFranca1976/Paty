@@ -66,7 +66,7 @@ const PedidoSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    default: "", // email do cliente
+    required: true, // agora cada pedido precisa ter um email válido
   },
   dataCancelamento: {
     type: Date,
