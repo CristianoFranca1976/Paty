@@ -140,33 +140,27 @@ app.post("/login", async (req, res) => {
 });
 
 // --- Buscar pedidos do usuário logado ---
+// --- Buscar pedidos do usuário logado ---
 app.get("/meus-pedidos", async (req, res) => {
   if (!req.session.usuario) {
+    console.log("❌ Sessão não encontrada em /meus-pedidos");
     return res.status(401).json({ erro: "Não autenticado" });
   }
 
+  console.log("✅ Usuário logado:", req.session.usuario);
+
   try {
-    // Busca pedidos só do email do usuário logado
     const pedidos = await Pedido.find({
-      email: req.session.usuario.email, // ✅ filtro pelo email
+      email: req.session.usuario.email,
     }).sort({ data: -1 });
 
+    console.log("📦 Pedidos encontrados:", pedidos);
+
     res.json(pedidos);
-    console.log("👤 Buscando pedidos de:", req.session.usuario.email);
   } catch (err) {
     console.error("Erro ao buscar pedidos:", err);
     res.status(500).json({ erro: "Erro ao buscar pedidos" });
   }
-});
-
-// Logout
-app.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.send("Erro ao sair.");
-    }
-    res.redirect("/");
-  });
 });
 
 // --- Salvar Pedido e Enviar E-mail ---
@@ -256,6 +250,8 @@ app.get("/historico", verificarLogin, async (req, res) => {
     const pedidos = await Pedido.find({
       email: req.session.usuario.email,
     }).sort({ data: -1 });
+
+    console.log("📦 Pedidos (historico):", pedidos);
 
     res.render("historico", { usuario: req.session.usuario, pedidos });
   } catch (err) {
