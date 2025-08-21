@@ -139,19 +139,21 @@ app.post("/login", async (req, res) => {
 // --- Buscar pedidos do usuário logado ---
 app.get("/meus-pedidos", async (req, res) => {
   if (!req.session.usuario) {
-    return res.status(401).json([]);
+    return res.status(401).json({ erro: "Não autenticado" });
   }
 
   try {
-    // Busca pedidos APENAS pelo email do usuário logado
-    const pedidos = await Pedido.find({ email: req.session.usuario.email }).sort({ data: -1 });
+    // Busca pedidos só do email do usuário logado
+    const pedidos = await Pedido.find({
+      email: req.session.usuario.email,  // ✅ filtro pelo email
+    }).sort({ data: -1 });
+
     res.json(pedidos);
   } catch (err) {
-    console.error("❌ Erro ao buscar pedidos:", err);
-    res.status(500).json([]);
+    console.error("Erro ao buscar pedidos:", err);
+    res.status(500).json({ erro: "Erro ao buscar pedidos" });
   }
 });
-
 
 
 // Logout
